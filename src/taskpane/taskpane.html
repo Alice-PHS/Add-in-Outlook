@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PHS - Outlook Add-in</title>
+
+    <!-- Office.js -->
+    <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+
+    <!-- Fluent UI -->
+    <link rel="stylesheet"
+        href="https://res-1.cdn.office.net/files/fabric-cdn-prod_20230815.002/office-ui-fabric-core/11.1.0/css/fabric.min.css" />
+
+    <!-- CSS -->
+    <link href="taskpane.css" rel="stylesheet" />
+</head>
+<div id="confirm-modal" 
+     style="position:fixed; top:0; left:0; width:100%; height:100%;
+            background:rgba(0,0,0,0.4); display:none; align-items:center; justify-content:center;">
+
+    <div style="background:white; padding:20px; border-radius:10px; width:280px;
+                text-align:center; box-shadow:0 2px 10px rgba(0,0,0,0.3);">
+
+        <p id="confirm-text" style="font-size:16px; margin-bottom:20px;">
+            Deseja salvar?
+        </p>
+
+        <div style="display:flex; justify-content:space-between;">
+            <button id="btn-confirm-yes" 
+                    style="padding:8px 16px; background:#0078D4; color:white; border:none; border-radius:5px; cursor:pointer;">
+                    Sim
+            </button>
+
+            <button id="btn-confirm-no" 
+                    style="padding:8px 16px; background:#ccc; color:black; border:none; border-radius:5px; cursor:pointer;">
+                    Não
+            </button>
+        </div>
+
+    </div>
+</div>
+<body class="ms-Fabric ms-font-m" style="background:rgba(255, 255, 255, 0.925); color:black;">
+
+    <!-- HEADER -->
+    <header class="ms-welcome__header ms-bgColor-neutralLighter" style="display:flex; gap:3px; align-items:center; padding:20px ;height: 170px; background:black; color:white;">
+        <img width="180" height="100" src="../../assets/logo-filled.png" alt="PHS Brasil" />
+        <h1 class="ms-font-su">Bem-Vindo</h1>
+    </header>
+
+    <!-- Mensagem de sideload -->
+    <section id="sideload-msg" class="ms-welcome__main">
+        <h2 class="ms-font-xl">
+            Por favor <a target="_blank" rel="noopener noreferrer"
+                href="https://learn.microsoft.com/office/dev/add-ins/testing/test-debug-office-add-ins#sideload-an-office-add-in-for-testing">sideload</a>
+            seu complemento para ver o corpo do aplicativo.
+        </h2>
+    </section>
+
+    <!-- MAIN APP -->
+    <main id="app-body" class="ms-welcome__main" style="display:none;">
+
+        <div id="message-box"
+            style="padding:10px; border:1px solid #ddd; border-radius:8px; background-color:#f4f4f4; margin-bottom:20px; display:none;">
+            <!-- JS vai preencher -->
+        </div>
+
+        <h2 class="ms-font-xl">Escolha uma pasta abaixo para enviar o e-mail e seus anexos:</h2>
+
+        <!-- LISTA DE PASTAS -->
+        <div id="folders-list"
+            style="margin: 20px 0; padding:10px; border:1px solid #ddd; border-radius:8px; min-height:50px; width: 200px;">
+            <!-- JS vai preencher -->
+            <img src="../../assets/folder.png" width="22" height="22" alt="Folder" />
+        </div>
+        
+        <h3 class="ms-font-xl">Caso queira fazer uma nova pasta para este e-mail: </h3>
+        <!-- BOTÃO RUN -->
+        <div role="button" id="run" class="ms-welcome__action ms-Button ms-Button--hero ms-font-xl"
+            style="margin-top:20px;">
+            <span class="ms-Button-label">Nova pasta</span>
+        </div> 
+
+        <p>
+            <label id="item-subject"></label>
+        </p>
+    </main>
+
+</body>
+
+</html>
