@@ -17,7 +17,7 @@
     <!-- CSS -->
     <link href="taskpane.css" rel="stylesheet" />
 </head>
-<div id="confirm-modal" 
+<!-- <div id="confirm-modal" 
      style="position:fixed; top:0; left:0; width:100%; height:100%;
             background:rgba(0,0,0,0.4); display:none; align-items:center; justify-content:center;">
 
@@ -41,7 +41,7 @@
         </div>
 
     </div>
-</div>
+</div> -->
 <body class="ms-Fabric ms-font-m" style="background:rgba(255, 255, 255, 0.925); color:black;">
 
     <!-- HEADER -->
@@ -87,6 +87,65 @@
             <label id="item-subject"></label>
         </p>
     </main>
+    
+    <!-- Tela de Confirmação -->
+    <div id="confirm-modal" 
+     style="position:fixed; top:0; left:0; width:100%; height:100%;
+            background:rgba(0,0,0,0.4); display:none; align-items:center; justify-content:center;">
+
+    <div style="background:white; padding:20px; border-radius:10px; width:280px;
+                text-align:center; box-shadow:0 2px 10px rgba(0,0,0,0.3);">
+
+        <p id="confirm-text" style="font-size:16px; margin-bottom:20px;">
+            Deseja salvar?
+        </p>
+
+        <div style="display:flex; justify-content:space-between;">
+            <button id="btn-confirm-yes" 
+                    style="padding:8px 16px; background:#0078D4; color:white; border:none; border-radius:5px; cursor:pointer;">
+                    Sim
+            </button>
+
+            <button id="btn-confirm-no" 
+                    style="padding:8px 16px; background:#ccc; color:black; border:none; border-radius:5px; cursor:pointer;">
+                    Não
+            </button>
+        </div>
+
+    </div>
+</div>
+
+    <!-- SPLASH SCREEN -->
+    <div id="splash-screen"
+     style="position:fixed; top:0; left:0; width:100%; height:100%;
+            background:rgba(0,0,0,0.6); display:none; align-items:center; justify-content:center;
+            z-index:9999;">
+    <div style="background:white; padding:25px; border-radius:12px; text-align:center; width:300px;
+                box-shadow:0 2px 12px rgba(0,0,0,0.3);">
+
+        <div class="loader" style="
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #0078D4;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            margin: 0 auto 15px auto;
+            animation: spin 1s linear infinite;">
+        </div>
+
+        <p style="font-size:17px;">
+            Enviando e-mail e anexos<br/>
+            para a pasta selecionada...
+        </p>
+    </div>
+</div>
+
+<style>
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+</style>
 
 </body>
 

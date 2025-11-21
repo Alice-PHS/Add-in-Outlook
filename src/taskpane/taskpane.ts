@@ -16,6 +16,7 @@ Office.onReady(async (info) => {
   }
 });
 
+//mostra a mensagem na tela para qual pagina foi
 function showMessage(message) {
     const box = document.getElementById("message-box");
     if (!box) return;
@@ -52,7 +53,7 @@ function waitForElement(id) {
   });
 }
 
-
+//pega o corpo do email
 async function getEmailBody(item) {
   return new Promise((resolve, reject) => {
     item.body.getAsync("text", (result) => {
@@ -65,7 +66,7 @@ async function getEmailBody(item) {
   });
 };
 
-
+//pega os anexos do email
 async function getAttachments(item) {
   if (!item.attachments || item.attachments.length === 0) {
     return [];
@@ -128,11 +129,9 @@ function getMimeType(extension) {
 }
 
 
-
+//função principal que roda ao clicar no botao de run, que é o que cria a pasta no sharepoint
 export async function run() {
-  /**
-   * Insert your Outlook code here
-   */
+
 
 const item = Office.context.mailbox.item;
 
@@ -152,7 +151,7 @@ const item = Office.context.mailbox.item;
     attachments: attachments
   };
 
-  // cria a pasta com o email
+  //link da automação que cria a pasta com quem enviou o email
   const flowUrl = "https://defaulte8fc68b65d194bf4a2c1a5ed5dc4c2.f5.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/147199a4a1cb4dbe98d5119cffa803bd/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=2kLY1Qkb-zgjJuEIpGJBR94VBHYMV-qkPgel0ubfu_U"; // coloque aqui a URL do gatilho HTTP real
 
   try {
@@ -177,6 +176,7 @@ const item = Office.context.mailbox.item;
   }
 };
 
+//mostra as pastas na tela
 async function showFolders() {
   const container = document.getElementById("folders-list");
   if (!container) {
@@ -235,7 +235,8 @@ async function showFolders() {
     container.innerHTML = "<p>Erro ao carregar as pastas.</p>";
   }
 };
-//pega as pastas do flow
+
+//link da automação que pega as pastas do flow
 const url = "https://defaulte8fc68b65d194bf4a2c1a5ed5dc4c2.f5.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/ed37f3d5436d4e928c3a7680cf95b076/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=jech5xSQ8_ib0EV2vu2JblGA9KP1cOJJGNpBsWM_BRY";
 
 async function carregarPastas() {
@@ -280,7 +281,7 @@ async function uploadToFolder(folderName) {
     body: await getEmailBody(item)
   };
 
-  //salva na pasta 
+  //link da automação que salva na pasta selecionada
   const flowUrl = "https://defaulte8fc68b65d194bf4a2c1a5ed5dc4c2.f5.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/0a1f02a5fb85469c9c9202ee125a044a/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=g78uUy_e-iG9t-rLhoLAPB40pmt6NHEOI0y_z3sYXUA";
 
   const response = await fetch(flowUrl, {
@@ -297,7 +298,7 @@ async function uploadToFolder(folderName) {
   }*/
 }
 
-function showConfirm(folderName: string) {
+/*function showConfirm(folderName: string) {
   const modal = document.getElementById("confirm-modal")!;
   const text = document.getElementById("confirm-text")!;
 
@@ -321,6 +322,53 @@ function showConfirm(folderName: string) {
     modal.style.display = "none";
     await uploadToFolder(folderName); // <-- chama seu flow
     showMessage("E-mail salvo na pasta com sucesso!");
+  });
+
+  newNo.addEventListener("click", () => {
+    modal.style.display = "none";
+    showMessage("Cancelado.");
+  });
+}*/
+
+function showConfirm(folderName: string) {
+  const modal = document.getElementById("confirm-modal")!;
+  const text = document.getElementById("confirm-text")!;
+  const splash = document.getElementById("splash-screen")!;
+
+  // Mensagem personalizada
+  text.textContent = `Deseja salvar o e-mail na pasta "${folderName}"?`;
+
+  modal.style.display = "flex";
+
+  // Botões
+  const btnYes = document.getElementById("btn-confirm-yes")!;
+  const btnNo = document.getElementById("btn-confirm-no")!;
+
+  // Remove eventos antigos para evitar duplicações
+  btnYes.replaceWith(btnYes.cloneNode(true));
+  btnNo.replaceWith(btnNo.cloneNode(true));
+
+  const newYes = document.getElementById("btn-confirm-yes")!;
+  const newNo = document.getElementById("btn-confirm-no")!;
+
+  newYes.addEventListener("click", async () => {
+    modal.style.display = "none";
+
+    // MOSTRA A SPLASH SCREEN
+    splash.style.display = "flex";
+
+    try {
+      await uploadToFolder(folderName); // <-- chama seu flow
+
+      // ESCONDE SPLASH
+      splash.style.display = "none";
+
+      showMessage("E-mail salvo na pasta com sucesso!");
+    } catch (err) {
+      splash.style.display = "none";
+      showMessage("Ocorreu um erro ao enviar.");
+      console.error(err);
+    }
   });
 
   newNo.addEventListener("click", () => {
