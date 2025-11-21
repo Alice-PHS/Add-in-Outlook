@@ -12,7 +12,6 @@ Office.onReady(async (info) => {
     document.getElementById("run").onclick = run;
     await waitForElement("folders-list");
     showFolders();
-    //showMessage("Notificação Funcionando!")
   }
 });
 
@@ -128,117 +127,7 @@ function getMimeType(extension) {
   return mimeTypes[extension] || null;
 }
 
-
-//função principal que roda ao clicar no botao de run, que é o que cria a pasta no sharepoint
-export async function run() {
-
-
-const item = Office.context.mailbox.item;
-
-  // Extrai informações básicas do e-mail
-  const subject = item.subject;
-  const from = item.from && item.from.emailAddress ? item.from.emailAddress : "";
-  const body = await getEmailBody(item);
-  const toRecipient = item.to && item.to.length > 0 ? item.to[0].emailAddress : "";
-  const attachments = await getAttachments(item);
-
-  // Monta o payload
-  const data = {
-    subject: subject,
-    to: toRecipient,
-    from: from,
-    body: body,
-    attachments: attachments
-  };
-
-  //link da automação que cria a pasta com quem enviou o email
-  const flowUrl = "https://defaulte8fc68b65d194bf4a2c1a5ed5dc4c2.f5.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/147199a4a1cb4dbe98d5119cffa803bd/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=2kLY1Qkb-zgjJuEIpGJBR94VBHYMV-qkPgel0ubfu_U"; // coloque aqui a URL do gatilho HTTP real
-
-  try {
-    const response = await fetch(flowUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(data)
-    });
-
-    if (response.ok) {
-      console.log("Fluxo acionado com sucesso!");
-      alert("Fluxo iniciado com sucesso!");
-    } else {
-      console.error("Erro ao acionar fluxo:", response.statusText);
-      alert("Erro ao acionar fluxo.");
-    }
-  } catch (error) {
-    console.error("Falha na requisição:", error);
-    alert("Falha ao conectar ao Power Automate.");
-  }
-};
-
-//mostra as pastas na tela
-async function showFolders() {
-  const container = document.getElementById("folders-list");
-  if (!container) {
-    console.error("Elemento #folders-list não encontrado no HTML.");
-    return;
-  }
-
-  container.innerHTML = "<p>Carregando pastas...</p>";
-
-  try {
-    // 🔹 Exemplo simulado (você substituirá pelo retorno da API do SharePoint)
-    const folders = await carregarPastas();
-
-    if (folders.length === 0) {
-      container.innerHTML = "<p>Nenhuma pasta encontrada.</p>";
-      return;
-    }
-
-    // Cria HTML para cada pasta
-    container.innerHTML = folders
-        .map(
-        (f) => `
-          <div class="folder-item" data-id="${f.id}" 
-              style="cursor:pointer; padding:8px; border:1px solid #ddd; margin-bottom:5px; border-radius:5px; display:flex; align-items:center; gap:8px;">
-            
-            <img src="../../assets/folder.png" 
-                alt="folder" width="20" height="20" 
-                style="pointer-events:none;" />
-
-            <span>${f.nome}</span>
-          </div>`
-      )
-      .join("");
-      /*.map(
-        (f) => `
-        <div class="folder-item" data-id="${f.id}" style="cursor:pointer; padding:8px; border:1px solid #ddd; margin-bottom:5px; border-radius:5px;">
-          ${f.nome}
-        </div>`
-      )
-      .join("");*/
-
-    // Adiciona evento de clique para cada pasta
-    document.querySelectorAll(".folder-item").forEach((el) => {
-      el.addEventListener("click", async (e) => {
-        const folderName = (e.target as HTMLElement).textContent?.trim() || ""; // Remove o ícone e espaços
-        showConfirm(folderName);
-        /*console.log("Clicou na pasta:", folderName);
-        showMessage(`Pasta selecionada: ${folderName}`);
-
-        // Aqui você pode chamar seu fluxo do Power Automate:
-        await uploadToFolder(folderName);*/
-      });
-    });
-  } catch (err) {
-    console.error(err);
-    container.innerHTML = "<p>Erro ao carregar as pastas.</p>";
-  }
-};
-
-//link da automação que pega as pastas do flow
-const url = "https://defaulte8fc68b65d194bf4a2c1a5ed5dc4c2.f5.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/ed37f3d5436d4e928c3a7680cf95b076/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=jech5xSQ8_ib0EV2vu2JblGA9KP1cOJJGNpBsWM_BRY";
-
+//Função que carrega as pastas do sharepoint, talvez depois usar o graph para ser mais rapido
 async function carregarPastas() {
     try {
         const response = await fetch(url, { method: "POST" });
@@ -266,8 +155,113 @@ async function carregarPastas() {
     }
 }
 
+//função que cria a pasta no sharepoint com o dominio do email
+export async function run() {
+  const item = Office.context.mailbox.item;
+
+    // MOSTRA A SPLASH SCREEN
+    const splash = document.getElementById("splash-screen")!;
+    if (splash) splash.style.display = "flex";
+
+    try {
+    // Extrai informações básicas do e-mail
+    const subject = item.subject;
+    const from = item.from && item.from.emailAddress ? item.from.emailAddress : "";
+    const body = await getEmailBody(item);
+    const toRecipient = item.to && item.to.length > 0 ? item.to[0].emailAddress : "";
+    const attachments = await getAttachments(item);
+
+    // Monta o payload
+    const data = {
+      subject: subject,
+      to: toRecipient,
+      from: from,
+      body: body,
+      attachments: attachments
+    };
+
+    //link da automação que cria a pasta com o dominio de email de quem enviou o email
+    const flowUrl = "https://defaulte8fc68b65d194bf4a2c1a5ed5dc4c2.f5.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/147199a4a1cb4dbe98d5119cffa803bd/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=2kLY1Qkb-zgjJuEIpGJBR94VBHYMV-qkPgel0ubfu_U"; // coloque aqui a URL do gatilho HTTP real
+      const response = await fetch(flowUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (splash) splash.style.display = "none";
+
+      if (response.ok) {
+        console.log("Fluxo acionado com sucesso!");
+        alert("Fluxo iniciado com sucesso!");
+      } else {
+        console.error("Erro ao acionar fluxo:", response.statusText);
+        alert("Erro ao acionar fluxo.");
+      }
+    } catch (error) {
+      if (splash) splash.style.display = "none";
+      console.error("Falha na requisição:", error);
+      alert("Falha ao conectar ao Power Automate.");
+    }
+};
+
+//mostra as pastas na tela
+async function showFolders() {
+  const container = document.getElementById("folders-list");
+  if (!container) {
+    console.error("Elemento #folders-list não encontrado no HTML.");
+    return;
+  }
+
+  container.innerHTML = "<p>Carregando pastas...</p>";
+
+  try {
+    const folders = await carregarPastas();
+
+    if (folders.length === 0) {
+      container.innerHTML = "<p>Nenhuma pasta encontrada.</p>";
+      return;
+    }
+
+    // Cria HTML para cada pasta, junto do ícone
+    container.innerHTML = folders
+        .map(
+        (f) => `
+          <div class="folder-item" data-id="${f.id}" 
+              style="cursor:pointer; padding:8px; border:1px solid #ddd; margin-bottom:5px; border-radius:5px; display:flex; align-items:center; gap:8px;">
+            
+            <img src="../../assets/folder.png" 
+                alt="folder" width="20" height="20" 
+                style="pointer-events:none;" />
+
+            <span>${f.nome}</span>
+          </div>`
+      )
+      .join("");
+    // Adiciona evento de clique para cada pasta
+    document.querySelectorAll(".folder-item").forEach((el) => {
+      el.addEventListener("click", async (e) => {
+        const folderName = (e.target as HTMLElement).textContent?.trim() || ""; // Remove o ícone e espaços
+        showConfirm(folderName);
+        /*console.log("Clicou na pasta:", folderName);
+        showMessage(`Pasta selecionada: ${folderName}`);
+
+        // Aqui você pode chamar seu fluxo do Power Automate:
+        await uploadToFolder(folderName);*/
+      });
+    });
+  } catch (err) {
+    console.error(err);
+    container.innerHTML = "<p>Erro ao carregar as pastas.</p>";
+  }
+};
+
+//link da automação que pega as pastas do flow
+const url = "https://defaulte8fc68b65d194bf4a2c1a5ed5dc4c2.f5.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/ed37f3d5436d4e928c3a7680cf95b076/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=jech5xSQ8_ib0EV2vu2JblGA9KP1cOJJGNpBsWM_BRY";
 
 
+//Função que envia o email para a pasta selecionada junto com os anexos
 async function uploadToFolder(folderName) {
   const item = Office.context.mailbox.item;
   const attachments = await getAttachments(item);
@@ -297,38 +291,6 @@ async function uploadToFolder(folderName) {
     showMessage(`Erro ao criar pasta.`);
   }*/
 }
-
-/*function showConfirm(folderName: string) {
-  const modal = document.getElementById("confirm-modal")!;
-  const text = document.getElementById("confirm-text")!;
-
-  // Mensagem personalizada
-  text.textContent = `Deseja salvar o e-mail na pasta "${folderName}"?`;
-
-  modal.style.display = "flex";
-
-  // Botões
-  const btnYes = document.getElementById("btn-confirm-yes")!;
-  const btnNo = document.getElementById("btn-confirm-no")!;
-
-  // Remove eventos antigos para evitar duplicações
-  btnYes.replaceWith(btnYes.cloneNode(true));
-  btnNo.replaceWith(btnNo.cloneNode(true));
-
-  const newYes = document.getElementById("btn-confirm-yes")!;
-  const newNo = document.getElementById("btn-confirm-no")!;
-
-  newYes.addEventListener("click", async () => {
-    modal.style.display = "none";
-    await uploadToFolder(folderName); // <-- chama seu flow
-    showMessage("E-mail salvo na pasta com sucesso!");
-  });
-
-  newNo.addEventListener("click", () => {
-    modal.style.display = "none";
-    showMessage("Cancelado.");
-  });
-}*/
 
 function showConfirm(folderName: string) {
   const modal = document.getElementById("confirm-modal")!;
@@ -376,14 +338,3 @@ function showConfirm(folderName: string) {
     showMessage("Cancelado.");
   });
 }
-
-
-
-  /*const item = Office.context.mailbox.item;
-  let insertAt = document.getElementById("item-subject");
-  let label = document.createElement("b").appendChild(document.createTextNode("Subject: "));
-  insertAt.appendChild(label);
-  insertAt.appendChild(document.createElement("br"));
-  insertAt.appendChild(document.createTextNode(item.subject));
-  insertAt.appendChild(document.createElement("br"));*/
-//}
